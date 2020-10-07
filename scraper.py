@@ -11,7 +11,7 @@ import time
 
 class GoogleImageScraper:
 
-    DIRECTORY_STORAGE = 'testimages'
+    DIRECTORY_STORAGE =
 
     def __init__(self):
         # clear the console and show some basic info
@@ -32,6 +32,7 @@ class GoogleImageScraper:
         self.links = []
         self.amount_to_scrape = 0
         self.amount_scraped = 0
+        self.directory = "images"
 
         # getting chromedriver from cache or download from internet
         print("Getting ChromeDriver ...")
@@ -40,19 +41,21 @@ class GoogleImageScraper:
         time.sleep(2)
         self.acceptPolicies()
 
-    def downloadImages(self, query, amount=50):
+    def downloadImages(self, query, directory='images', amount=50):
         self.amount_to_scrape = amount - 1
+        self.directory = directory
+
         self.searchFor(query)
         self.openImagesTab()
         self.links = self.getImageURLS()
 
         for link in self.links:
-            self.storeImageAs(link, self.DIRECTORY_STORAGE)
+            self.storeImageAs(link)
 
     # Returns hash value of the image saved by the url given
-    def storeImageAs(self, url, directory, amount_of_attempts=1):
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    def storeImageAs(self, url, amount_of_attempts=1):
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
 
         # make 'undetectable' header to avoid being seen as scraper
         headers = {
@@ -72,7 +75,7 @@ class GoogleImageScraper:
                 sleepy_time = amount_of_attempts * 30
                 print("Attempt number {}: sleeping for {} seconds ...".format(amount_of_attempts, sleepy_time))
                 time.sleep(sleepy_time)
-                return self.storeImageAs(url, directory, amount_of_attempts + 1)
+                return self.storeImageAs(url, amount_of_attempts + 1)
             else:
                 # Settle with the fact this one won't be stored
                 error = "Amount of attempts exceeded in storage_helper\n" \
@@ -90,9 +93,9 @@ class GoogleImageScraper:
             f.close()
 
             # change png to jpg
-            im = Image.open("{}/{}/{}.png".format(os.getcwd(), directory, temp_name))
+            im = Image.open("{}/{}/{}.png".format(os.getcwd(), self.directory, temp_name))
             rgb_im = im.convert('RGB')
-            rgb_im.save("{}/{}/{}.jpg".format(os.getcwd(), directory, temp_name))
+            rgb_im.save("{}/{}/{}.jpg".format(os.getcwd(), self.directory, temp_name))
 
             # remove the temporary file
             os.remove("{}.png".format(temp_name))
@@ -106,7 +109,7 @@ class GoogleImageScraper:
             # open the file and convert the file to jpeg
             im = Image.open("{}.webp".format(temp_name)).convert("RGB")
             # save the jpeg file in the directory it belongs
-            im.save("{}/{}/{}.jpg".format(os.getcwd(), directory, temp_name), "jpeg")
+            im.save("{}/{}/{}.jpg".format(os.getcwd(), self.directory, temp_name), "jpeg")
 
             # remove the temporary file
             os.remove("{}.webp".format(temp_name))
@@ -117,18 +120,18 @@ class GoogleImageScraper:
 
         # We assume its a jpg image
         else:
-            f = open("{}/{}/{}.jpg".format(os.getcwd(), directory, temp_name), 'wb')
+            f = open("{}/{}/{}.jpg".format(os.getcwd(), self.directory, temp_name), 'wb')
             f.write(response.read())
             f.close()
 
         # rename saved image to their hashvalue, so it's easy to compare (hashes of) images later on
-        im = Image.open('{}/{}/{}.jpg'.format(os.getcwd(), directory, temp_name))
+        im = Image.open('{}/{}/{}.jpg'.format(os.getcwd(), self.directory, temp_name))
         hashvalue = hashlib.md5(im.tobytes()).hexdigest()
 
-        os.rename('{}/{}/{}.jpg'.format(os.getcwd(), directory, temp_name),
-                  '{}/{}/{}.jpg'.format(os.getcwd(), directory, hashvalue))
+        os.rename('{}/{}/{}.jpg'.format(os.getcwd(), self.directory, temp_name),
+                  '{}/{}/{}.jpg'.format(os.getcwd(), self.directory, hashvalue))
 
-        print("Image saved as {}/{}/{}.jpg".format(os.getcwd(), directory, hashvalue))
+        print("Image saved as {}/{}/{}.jpg".format(os.getcwd(), self.directory, hashvalue))
 
         return hashvalue
 
@@ -222,3 +225,4 @@ class GoogleImageScraper:
         except Exception as e:
             # Pop up accept policies probably not presented
             print(e)
+
