@@ -11,8 +11,6 @@ import time
 
 class GoogleImageScraper:
 
-    DIRECTORY_STORAGE =
-
     def __init__(self):
         # clear the console and show some basic info
         os.system("clear")
