@@ -1,4 +1,4 @@
-from scraper.py import GoogleImageScraper
+from scraper import GoogleImageScraper
 
 if __name__ == '__main__':
     scraper = GoogleImageScraper()
