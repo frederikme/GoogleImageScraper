@@ -1,6 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 import urllib.request
 from PIL import Image
@@ -194,7 +197,8 @@ class GoogleImageScraper:
     def searchFor(self, query):
         try:
             xpath = '//input[@name="q"]'
-
+            WebDriverWait(self.browser, 5).until(
+                EC.presence_of_element_located((By.XPATH, xpath)))
             element = self.browser.find_element_by_xpath(xpath)
             element.send_keys(query)
             element.send_keys(Keys.ENTER)
@@ -204,9 +208,10 @@ class GoogleImageScraper:
 
     def openImagesTab(self):
         try:
-            xpath = '//a[@data-sc="I"]'
-
-            elem = self.browser.find_element_by_xpath(xpath)
+            xpath = '//*[@class="hide-focus-ring"]'
+            WebDriverWait(self.browser, 5).until(
+                EC.presence_of_element_located((By.XPATH, xpath)))
+            elem = self.browser.find_elements_by_xpath(xpath)[0]
             elem.click()
         except Exception as e:
             print(e)
