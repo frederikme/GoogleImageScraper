@@ -16,7 +16,7 @@ class GoogleImageScraper:
 
     def __init__(self):
         # clear the console and show some basic info
-        os.system("clear")
+        os.system('cls' if os.name=='nt' else 'clear')
         text = '''   
  ____                                 
 / ___|  ___ _ __ __ _ _ __   ___ _ __ 
