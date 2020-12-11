@@ -217,15 +217,18 @@ class GoogleImageScraper:
             print(e)
 
     def acceptPolicies(self):
-        self.browser.switch_to.frame(self.browser.find_element_by_xpath('//*[@id="cnsw"]/iframe'))
-        xpath = '//*[@id="introAgreeButton"]'
-
         try:
+            iframe_xpath = '//*[@id="cnsw"]/iframe'
+            WebDriverWait(self.browser, 5).until(
+                EC.presence_of_element_located((By.XPATH, iframe_xpath)))
+            self.browser.switch_to.frame(self.browser.find_element_by_xpath(iframe_xpath))
+            xpath = '//*[@id="introAgreeButton"]'
             acceptBtn = self.browser.find_element_by_xpath(xpath)
             acceptBtn.click()
 
             self.browser.switch_to.default_content()
         except Exception as e:
             # Pop up accept policies probably not presented
-            print(e)
+            #print("Error thrown: " + str(e))
+            print("Googles policies are probably not presented. Let's continue...")
 
